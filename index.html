@@ -4,33 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Made for Shourya by Prince</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
-
-        :root {
-            --neon-blue: #00e0ff;
-            --neon-pink: #ff00e0;
-            --neon-purple: #8e00ff;
-            --dark-bg: #0d0d1a;
-            --card-bg: #1a1a2e;
-            --card-border: 1px solid rgba(255, 255, 255, 0.1);
-            --text-color: #f0f0f0;
-        }
-
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Roboto Mono', monospace;
-            background-color: var(--dark-bg);
-            color: var(--text-color);
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
             min-height: 100vh;
         }
 
@@ -44,210 +31,249 @@
         }
 
         .container {
-            width: 90%;
-            max-width: 800px;
-            padding: 2.5rem;
-            background: var(--card-bg);
-            border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 40px var(--neon-purple), 0 0 60px var(--neon-pink);
-            border: var(--card-border);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
             position: relative;
             z-index: 1;
-            transition: all 0.3s ease;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
         }
 
-        .header h1 {
+        .title {
             font-size: 2.5rem;
-            color: var(--neon-blue);
-            text-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue);
-            letter-spacing: 2px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00);
+            background-size: 200% 200%;
+            animation: gradient 3s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
         }
-        .header p {
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-            color: var(--neon-pink);
-            text-shadow: 0 0 3px var(--neon-pink);
+
+        .subtitle {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .panel {
+            background: rgba(20, 20, 30, 0.9);
+            border: 2px solid #00ffff;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .panel h2 {
+            color: #00ffff;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            text-align: center;
         }
 
         .drop-zone {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 150px;
-            border: 2px dashed var(--neon-blue);
+            border: 3px dashed #ff00ff;
             border-radius: 15px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 1.5rem;
+            padding: 3rem;
             text-align: center;
-        }
-        .drop-zone:hover {
-            background-color: rgba(0, 224, 255, 0.1);
-        }
-        .drop-zone p {
-            margin: 0;
-            font-size: 1.1rem;
-            color: var(--neon-blue);
-        }
-        .drop-zone p.info {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 0, 255, 0.1);
+            margin-bottom: 1.5rem;
         }
 
-        .file-list {
-            list-style: none;
-            margin-bottom: 1.5rem;
-            max-height: 200px;
-            overflow-y: auto;
-            padding-right: 10px;
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: #ffff00;
+            background: rgba(255, 255, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
         }
-        .file-list::-webkit-scrollbar {
-            width: 8px;
+
+        .drop-zone-text {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
         }
-        .file-list::-webkit-scrollbar-track {
-            background: var(--card-bg);
+
+        .btn {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 25px rgba(255, 0, 255, 0.7);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .selected-files {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 255, 255, 0.1);
             border-radius: 10px;
+            border: 1px solid #00ffff;
         }
-        .file-list::-webkit-scrollbar-thumb {
-            background: var(--neon-purple);
-            border-radius: 10px;
-        }
-        .file-list li {
-            padding: 0.5rem;
-            border-bottom: var(--card-border);
-            font-size: 0.9rem;
+
+        .file-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            word-break: break-all;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
         }
-        .file-list li .remove-btn {
-            background: transparent;
+
+        .file-name {
+            flex: 1;
+            color: #ffffff;
+        }
+
+        .file-size {
+            color: #888;
+            margin-right: 1rem;
+        }
+
+        .remove-btn {
+            background: #ff4444;
             border: none;
-            color: var(--neon-pink);
-            font-weight: bold;
-            font-size: 1.2rem;
+            border-radius: 15px;
+            padding: 5px 10px;
+            color: white;
             cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .file-list li .remove-btn:hover {
-            transform: scale(1.2);
+            font-size: 0.8rem;
         }
 
         .options {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 1.5rem;
-        }
-        .options .option-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .options label {
-            color: var(--neon-blue);
-            text-shadow: 0 0 2px var(--neon-blue);
-        }
-        .options input[type="password"],
-        .options input[type="text"],
-        .options select {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--neon-blue);
-            border-radius: 8px;
-            color: var(--text-color);
-            padding: 0.8rem;
-            font-family: 'Roboto Mono', monospace;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        .options input:focus, .options select:focus {
-            box-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue);
+            margin: 1.5rem 0;
         }
 
-        .slider-group {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        .option-group {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid #444;
         }
-        input[type="range"] {
-            -webkit-appearance: none;
+
+        .option-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        .slider {
             width: 100%;
             height: 8px;
-            background: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
+            background: #333;
             outline: none;
-            transition: all 0.3s ease;
+            -webkit-appearance: none;
         }
-        input[type="range"]::-webkit-slider-thumb {
+
+        .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
             width: 20px;
             height: 20px;
-            background: var(--neon-pink);
             border-radius: 50%;
+            background: #ff00ff;
             cursor: pointer;
-            box-shadow: 0 0 5px var(--neon-pink);
-            transition: background 0.3s ease;
-        }
-        #compression-value {
-            min-width: 40px;
-            text-align: right;
-            color: var(--neon-pink);
-            text-shadow: 0 0 2px var(--neon-pink);
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
         }
 
-        .actions {
-            margin-top: 2rem;
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-        .btn {
-            padding: 1rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Roboto Mono', monospace;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
-            background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
-            color: var(--text-color);
-        }
-        .btn:hover {
-            box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
-            transform: translateY(-2px);
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #444;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            outline: none;
         }
 
-        .status-message, .progress-bar {
-            margin-top: 1.5rem;
-            text-align: center;
-            font-size: 0.9rem;
+        .input-field:focus {
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .progress-container {
+            margin: 1.5rem 0;
+            display: none;
         }
 
         .progress-bar {
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
             overflow: hidden;
-            display: none;
-        }
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
-            transition: width 0.3s ease;
+            border: 1px solid #00ffff;
         }
 
-        .popup-overlay {
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            color: #00ffff;
+        }
+
+        .message {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .message.success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+
+        .message.error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff0000;
+            color: #ff0000;
+        }
+
+        .popup {
             position: fixed;
             top: 0;
             left: 0;
@@ -255,458 +281,584 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.8);
             display: none;
+            z-index: 1000;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
         }
-        .popup {
-            background: var(--card-bg);
-            border: 2px solid var(--neon-pink);
-            border-radius: 15px;
+
+        .popup-content {
+            background: #1a1a2e;
+            border: 3px solid #ff0000;
+            border-radius: 20px;
             padding: 2rem;
             text-align: center;
-            box-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink);
+            max-width: 400px;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.7);
+            animation: pulse 2s infinite;
         }
-        .popup h3 {
-            color: var(--neon-pink);
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 50px rgba(255, 0, 0, 0.7); }
+            50% { box-shadow: 0 0 80px rgba(255, 0, 0, 1); }
+        }
+
+        .popup-title {
+            color: #ff0000;
             font-size: 1.5rem;
             margin-bottom: 1rem;
         }
-        .popup p {
+
+        .popup-message {
+            color: #ffffff;
             margin-bottom: 1.5rem;
             line-height: 1.5;
         }
-        .popup .close-btn {
-            background: var(--neon-pink);
-            color: var(--dark-bg);
-            padding: 0.75rem 2rem;
+
+        .close-btn {
+            background: #ff0000;
             border: none;
-            border-radius: 8px;
+            border-radius: 15px;
+            padding: 10px 20px;
+            color: white;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .popup .close-btn:hover {
+
+        .close-btn:hover {
+            background: #ff3333;
             transform: scale(1.05);
-            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .stored-files {
+            margin-top: 2rem;
+        }
+
+        .stored-file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+        }
+
+        .download-btn {
+            background: #00ff00;
+            border: none;
+            border-radius: 15px;
+            padding: 8px 15px;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: #33ff33;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-
     <canvas id="bg-canvas"></canvas>
-
+    
     <div class="container">
         <div class="header">
-            <h1>File Archiver</h1>
-            <p>Made for Shourya by Prince</p>
+            <h1 class="title">Made for Shourya by Prince</h1>
+            <p class="subtitle">Advanced File Archive Manager</p>
         </div>
 
-        <label for="file-input" class="drop-zone" id="drop-zone">
-            <p>Drag & Drop files here</p>
-            <p class="info">or click to browse</p>
-            <input type="file" id="file-input" multiple hidden>
-        </label>
-
-        <ul class="file-list" id="file-list"></ul>
-
-        <div class="options">
-            <div class="option-group">
-                <label for="compression-level">Compression Level: <span id="compression-value">5</span></label>
-                <input type="range" id="compression-level" min="0" max="9" value="5">
+        <div class="panel">
+            <h2>🗃️ Create Archive</h2>
+            
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-text">
+                    📁 Drag & Drop Files Here or Click to Browse
+                </div>
+                <button class="btn" onclick="document.getElementById('fileInput').click()">
+                    Select Files
+                </button>
+                <input type="file" id="fileInput" class="file-input" multiple>
             </div>
-            <div class="option-group">
-                <label for="password">Password (optional):</label>
-                <input type="password" id="password" placeholder="Enter password for archive">
+
+            <div class="selected-files" id="selectedFiles" style="display: none;">
+                <h3 style="color: #00ffff; margin-bottom: 1rem;">Selected Files:</h3>
+                <div id="fileList"></div>
             </div>
-            <div class="option-group">
-                <label for="archive-format">Archive Format:</label>
-                <select id="archive-format">
-                    <option value="zip">ZIP</option>
-                    <option value="tar">TAR</option>
-                    <option value="gzip">Gzip</option>
-                </select>
+
+            <div class="options">
+                <div class="option-group">
+                    <label class="option-label">Compression Level</label>
+                    <input type="range" class="slider" id="compressionSlider" min="0" max="9" value="6">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #888; margin-top: 0.5rem;">
+                        <span>No Compression</span>
+                        <span>Maximum</span>
+                    </div>
+                </div>
+                
+                <div class="option-group">
+                    <label class="option-label">Password (Optional)</label>
+                    <input type="password" class="input-field" id="passwordInput" placeholder="Enter password...">
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="btn" id="createArchiveBtn" onclick="createArchive()">
+                    🗜️ Create ZIP Archive
+                </button>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Processing...</div>
             </div>
         </div>
 
-        <div class="actions">
-            <button class="btn" id="zip-btn">Create Archive</button>
-            <button class="btn" id="unzip-btn">Extract Archive</button>
+        <div class="panel">
+            <h2>📦 Extract Archive</h2>
+            
+            <div class="drop-zone" id="extractDropZone">
+                <div class="drop-zone-text">
+                    📂 Drop ZIP Archive Here or Click to Browse
+                </div>
+                <button class="btn" onclick="document.getElementById('extractInput').click()">
+                    Select Archive
+                </button>
+                <input type="file" id="extractInput" class="file-input" accept=".zip">
+            </div>
+
+            <div style="text-align: center; margin-top: 1rem;">
+                <button class="btn" id="extractBtn" onclick="extractArchive()" disabled>
+                    🔓 Extract Files
+                </button>
+            </div>
         </div>
 
-        <div class="progress-bar" id="progress-bar">
-            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        <div class="stored-files" id="storedFiles" style="display: none;">
+            <div class="panel">
+                <h2>💾 Stored Files</h2>
+                <div id="storedFilesList"></div>
+            </div>
         </div>
-        <div class="status-message" id="status-message"></div>
+
+        <div id="messageArea"></div>
     </div>
 
-    <div class="popup-overlay" id="popup-overlay">
-        <div class="popup">
-            <h3>⚠️ Warning!</h3>
-            <p>Local Storage can only handle files up to **10 MB**. Please upload a smaller file.</p>
-            <button class="close-btn" id="close-popup">Got It</button>
+    <!-- Warning Popup -->
+    <div class="popup" id="warningPopup">
+        <div class="popup-content">
+            <div class="popup-title">⚠️ Warning</div>
+            <div class="popup-message">
+                Local Storage can only handle files up to 10 MB. Please upload a smaller file.
+            </div>
+            <button class="close-btn" onclick="closeWarning()">OK</button>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
-        const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('file-input');
-        const fileList = document.getElementById('file-list');
-        const zipBtn = document.getElementById('zip-btn');
-        const unzipBtn = document.getElementById('unzip-btn');
-        const compressionLevel = document.getElementById('compression-level');
-        const compressionValue = document.getElementById('compression-value');
-        const passwordInput = document.getElementById('password');
-        const archiveFormat = document.getElementById('archive-format');
-        const progressBar = document.getElementById('progress-bar');
-        const progressBarFill = document.getElementById('progress-bar-fill');
-        const statusMessage = document.getElementById('status-message');
-        const popupOverlay = document.getElementById('popup-overlay');
-        const closePopupBtn = document.getElementById('close-popup');
-        
-        let files = [];
-        const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+        // In-memory storage for files
+        const fileStorage = new Map();
+        let selectedFiles = [];
+        let archiveToExtract = null;
 
-        // --- Background Animation ---
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            particles = [];
-            initParticles();
-        });
+        // Three.js animated background
+        let scene, camera, renderer, particles = [];
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        function initBackground() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
 
-        function initParticles() {
-            for (let i = 0; i < 150; i++) {
-                particles.push(new Particle());
-            }
-        }
+            // Create neon particles
+            const particleCount = 50;
+            const colors = [0x00ffff, 0xff00ff, 0xffff00, 0x00ff00];
 
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * 0.5 - 0.25;
-                this.color = Math.random() > 0.5 ? 'var(--neon-blue)' : 'var(--neon-pink)';
+            for (let i = 0; i < particleCount; i++) {
+                const geometry = new THREE.SphereGeometry(0.05, 8, 8);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const particle = new THREE.Mesh(geometry, material);
+
+                particle.position.x = (Math.random() - 0.5) * 20;
+                particle.position.y = (Math.random() - 0.5) * 20;
+                particle.position.z = (Math.random() - 0.5) * 20;
+
+                particle.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.02,
+                    (Math.random() - 0.5) * 0.02,
+                    (Math.random() - 0.5) * 0.02
+                );
+
+                scene.add(particle);
+                particles.push(particle);
             }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
+
+            camera.position.z = 5;
+            animate();
         }
 
         function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
-            }
             requestAnimationFrame(animate);
+
+            particles.forEach(particle => {
+                particle.position.add(particle.velocity);
+
+                // Bounce off boundaries
+                if (particle.position.x > 10 || particle.position.x < -10) particle.velocity.x *= -1;
+                if (particle.position.y > 10 || particle.position.y < -10) particle.velocity.y *= -1;
+                if (particle.position.z > 10 || particle.position.z < -10) particle.velocity.z *= -1;
+
+                // Rotate for extra effect
+                particle.rotation.x += 0.01;
+                particle.rotation.y += 0.01;
+            });
+
+            renderer.render(scene, camera);
         }
 
-        initParticles();
-        animate();
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
 
-        // --- File Handling ---
-        const saveToLocalStorage = async () => {
-            try {
-                const serializedFiles = files.map(file => {
-                    const bytes = new Uint8Array(file.data);
-                    const binaryString = String.fromCharCode(...bytes);
-                    return {
-                        name: file.name,
-                        size: file.size,
-                        type: file.type,
-                        data: btoa(binaryString),
-                    };
-                });
-                localStorage.setItem('shourya_files', JSON.stringify(serializedFiles));
-                console.log('✅ Files saved to local storage.');
-            } catch (e) {
-                console.error('❌ Error saving to local storage:', e);
-                setStatus('Error saving files. Local storage is full.', 'error');
-            }
-        };
+        // File handling functions
+        function checkFileSize(file) {
+            const maxSize = 10 * 1024 * 1024; // 10 MB
+            return file.size <= maxSize;
+        }
 
-        const loadFromLocalStorage = async () => {
-            const storedFiles = localStorage.getItem('shourya_files');
-            if (storedFiles) {
-                try {
-                    const parsedFiles = JSON.parse(storedFiles);
-                    if (parsedFiles.length > 0) {
-                        files = parsedFiles.map(file => {
-                            const binaryString = atob(file.data);
-                            const len = binaryString.length;
-                            const bytes = new Uint8Array(len);
-                            for (let i = 0; i < len; i++) {
-                                bytes[i] = binaryString.charCodeAt(i);
-                            }
-                            const newFile = new File([bytes.buffer], file.name, { type: file.type });
-                            newFile.data = bytes.buffer;
-                            return newFile;
-                        });
-                        updateFileList();
-                        setStatus('Files loaded from local storage.', 'success');
-                        console.log('✅ Files loaded from local storage.');
-                    }
-                } catch (e) {
-                    console.error('❌ Error loading from local storage:', e);
-                    setStatus('Error loading files. Local storage data is corrupt.', 'error');
+        function showWarning() {
+            document.getElementById('warningPopup').style.display = 'flex';
+        }
+
+        function closeWarning() {
+            document.getElementById('warningPopup').style.display = 'none';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function addFiles(files) {
+            for (let file of files) {
+                if (!checkFileSize(file)) {
+                    showWarning();
+                    continue;
                 }
+                selectedFiles.push(file);
             }
-        };
+            updateFileList();
+        }
 
-        const handleFiles = (fileListObj) => {
-            console.log('🔍 Handling files...');
-            if (fileListObj.length === 0) {
-                setStatus('No files selected.', 'error');
-                console.log('⚠️ No files selected.');
-                return;
-            }
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileList();
+        }
 
-            // Clear previous files and set up new ones
-            files = [];
-            const readers = [];
+        function updateFileList() {
+            const container = document.getElementById('selectedFiles');
+            const list = document.getElementById('fileList');
             
-            // Check file sizes and create a list of promises
-            for (const file of fileListObj) {
-                if (file.size > MAX_SIZE) {
-                    showPopup();
-                    return;
-                }
-                readers.push(
-                    new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => {
-                            file.data = reader.result;
-                            files.push(file);
-                            resolve();
-                        };
-                        reader.onerror = () => {
-                            reject(new Error(`Failed to read file: ${file.name}`));
-                        };
-                        reader.readAsArrayBuffer(file);
-                    })
-                );
-            }
-
-            // Wait for all files to be read before updating the UI
-            Promise.all(readers).then(() => {
-                console.log('✅ All files read successfully.');
-                updateFileList();
-                saveToLocalStorage();
-            }).catch(e => {
-                setStatus('Error reading files. Please try again.', 'error');
-                console.error('❌ Promise.all failed:', e);
-            });
-        };
-
-        const updateFileList = () => {
-            fileList.innerHTML = '';
-            files.forEach((file, index) => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <span>${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                    <button class="remove-btn" data-index="${index}">&#10006;</button>
-                `;
-                fileList.appendChild(li);
-            });
-
-            if (files.length > 0) {
-                statusMessage.textContent = `${files.length} file(s) loaded.`;
-                console.log(`✅ File list updated with ${files.length} file(s).`);
-            } else {
-                statusMessage.textContent = 'Ready to accept files.';
-            }
-        };
-
-        fileList.addEventListener('click', (e) => {
-            if (e.target.classList.contains('remove-btn')) {
-                const index = e.target.dataset.index;
-                files.splice(index, 1);
-                updateFileList();
-                saveToLocalStorage();
-                console.log(`🗑️ File at index ${index} removed.`);
-            }
-        });
-
-        // --- UI Interactions ---
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.style.border = `2px dashed ${var(--neon-pink)}`;
-        });
-
-        dropZone.addEventListener('dragleave', (e) => {
-            dropZone.style.border = `2px dashed ${var(--neon-blue)}`;
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.style.border = `2px dashed ${var(--neon-blue)}`;
-            handleFiles(e.dataTransfer.files);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
-
-        compressionLevel.addEventListener('input', (e) => {
-            compressionValue.textContent = e.target.value;
-        });
-
-        closePopupBtn.addEventListener('click', () => {
-            popupOverlay.style.display = 'none';
-        });
-
-        // --- Core Logic ---
-        const setStatus = (msg, type = 'info') => {
-            statusMessage.textContent = msg;
-            statusMessage.style.color = type === 'error' ? 'var(--neon-pink)' : (type === 'success' ? 'var(--neon-blue)' : 'var(--text-color)');
-            progressBar.style.display = 'none';
-        };
-
-        const showProgress = (value) => {
-            progressBar.style.display = 'block';
-            progressBarFill.style.width = `${value}%`;
-            statusMessage.textContent = `Processing... ${value.toFixed(0)}%`;
-        };
-
-        const showPopup = () => {
-            popupOverlay.style.display = 'flex';
-        };
-
-        zipBtn.addEventListener('click', async () => {
-            if (files.length === 0) {
-                setStatus('Please select files to archive.', 'error');
+            if (selectedFiles.length === 0) {
+                container.style.display = 'none';
                 return;
             }
 
-            setStatus('Creating archive...', 'info');
-            console.log('📦 Starting ZIP creation...');
-            const zip = new JSZip();
-            const format = archiveFormat.value;
-            const compression = parseInt(compressionLevel.value);
-            const password = passwordInput.value;
+            container.style.display = 'block';
+            list.innerHTML = '';
 
-            for (const file of files) {
-                if (file.data) {
-                    zip.file(file.name, file.data);
-                    console.log(`- Adding file: ${file.name}`);
-                }
+            selectedFiles.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                item.innerHTML = `
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">${formatFileSize(file.size)}</span>
+                    <button class="remove-btn" onclick="removeFile(${index})">Remove</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function showProgress() {
+            document.getElementById('progressContainer').style.display = 'block';
+        }
+
+        function hideProgress() {
+            document.getElementById('progressContainer').style.display = 'none';
+        }
+
+        function updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = text;
+        }
+
+        function showMessage(text, type) {
+            const messageArea = document.getElementById('messageArea');
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = text;
+            messageArea.appendChild(message);
+            
+            setTimeout(() => {
+                message.remove();
+            }, 5000);
+        }
+
+        async function createArchive() {
+            if (selectedFiles.length === 0) {
+                showMessage('Please select files to archive.', 'error');
+                return;
             }
 
+            showProgress();
+            updateProgress(10, 'Initializing...');
+
             try {
-                const options = {
-                    type: "blob",
-                    compression: "DEFLATE",
+                const zip = new JSZip();
+                const compressionLevel = document.getElementById('compressionSlider').value;
+                const password = document.getElementById('passwordInput').value;
+
+                updateProgress(30, 'Adding files to archive...');
+
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    const arrayBuffer = await file.arrayBuffer();
+                    zip.file(file.name, arrayBuffer);
+                    updateProgress(30 + (i / selectedFiles.length) * 40, `Adding ${file.name}...`);
+                }
+
+                updateProgress(70, 'Compressing archive...');
+
+                const zipOptions = {
+                    type: 'blob',
+                    compression: 'DEFLATE',
                     compressionOptions: {
-                        level: compression
-                    },
-                    password: password || undefined,
-                    onUpdate: (metadata) => {
-                        showProgress(metadata.percent);
+                        level: parseInt(compressionLevel)
                     }
                 };
+
+                const zipBlob = await zip.generateAsync(zipOptions);
+                updateProgress(90, 'Finalizing...');
+
+                // Store in memory
+                const timestamp = Date.now();
+                const fileName = `archive_${timestamp}.zip`;
+                fileStorage.set(fileName, zipBlob);
+
+                updateProgress(100, 'Complete!');
                 
-                let outputBlob;
-                if (format === 'zip') {
-                    outputBlob = await zip.generateAsync(options);
-                } else if (format === 'tar') {
-                    setStatus('TAR format is not yet supported. Using ZIP.', 'error');
-                    outputBlob = await zip.generateAsync(options);
-                } else if (format === 'gzip') {
-                    const gzip = await JSZip.compress(await zip.generateAsync({type: 'blob'}), { level: compression });
-                    outputBlob = new Blob([gzip], { type: 'application/gzip' });
+                setTimeout(() => {
+                    hideProgress();
+                    showMessage(`Archive created successfully! (${formatFileSize(zipBlob.size)})`, 'success');
+                    updateStoredFiles();
+                    
+                    // Reset form
+                    selectedFiles = [];
+                    updateFileList();
+                    document.getElementById('passwordInput').value = '';
+                }, 1000);
+
+            } catch (error) {
+                hideProgress();
+                showMessage('Error creating archive: ' + error.message, 'error');
+            }
+        }
+
+        async function extractArchive() {
+            if (!archiveToExtract) {
+                showMessage('Please select an archive to extract.', 'error');
+                return;
+            }
+
+            showProgress();
+            updateProgress(20, 'Reading archive...');
+
+            try {
+                const zip = new JSZip();
+                const contents = await zip.loadAsync(archiveToExtract);
+                
+                updateProgress(50, 'Extracting files...');
+
+                const extractedFiles = [];
+                const fileNames = Object.keys(contents.files);
+
+                for (let i = 0; i < fileNames.length; i++) {
+                    const fileName = fileNames[i];
+                    const file = contents.files[fileName];
+                    
+                    if (!file.dir) {
+                        const blob = await file.async('blob');
+                        extractedFiles.push({ name: fileName, blob: blob });
+                        updateProgress(50 + (i / fileNames.length) * 40, `Extracting ${fileName}...`);
+                    }
                 }
 
-                const url = URL.createObjectURL(outputBlob);
+                updateProgress(90, 'Storing extracted files...');
+
+                // Store extracted files
+                extractedFiles.forEach(file => {
+                    const timestamp = Date.now();
+                    const uniqueName = `extracted_${timestamp}_${file.name}`;
+                    fileStorage.set(uniqueName, file.blob);
+                });
+
+                updateProgress(100, 'Extraction complete!');
+
+                setTimeout(() => {
+                    hideProgress();
+                    showMessage(`Successfully extracted ${extractedFiles.length} files!`, 'success');
+                    updateStoredFiles();
+                    archiveToExtract = null;
+                    document.getElementById('extractBtn').disabled = true;
+                }, 1000);
+
+            } catch (error) {
+                hideProgress();
+                showMessage('Error extracting archive: ' + error.message, 'error');
+            }
+        }
+
+        function updateStoredFiles() {
+            const container = document.getElementById('storedFiles');
+            const list = document.getElementById('storedFilesList');
+
+            if (fileStorage.size === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            list.innerHTML = '';
+
+            fileStorage.forEach((blob, fileName) => {
+                const item = document.createElement('div');
+                item.className = 'stored-file-item';
+                item.innerHTML = `
+                    <div>
+                        <div class="file-name">${fileName}</div>
+                        <div class="file-size">${formatFileSize(blob.size)}</div>
+                    </div>
+                    <button class="download-btn" onclick="downloadFile('${fileName}')">
+                        Download
+                    </button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function downloadFile(fileName) {
+            const blob = fileStorage.get(fileName);
+            if (blob) {
+                const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `shourya_archive.${format === 'zip' ? 'zip' : (format === 'tar' ? 'tar' : 'gz')}`;
+                a.download = fileName;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-
-                setStatus('Archive created successfully! Download started.', 'success');
-                console.log('✅ Archive created successfully.');
-                setTimeout(() => setStatus('Ready to accept files.'), 3000);
-            } catch (error) {
-                console.error("❌ Error creating archive:", error);
-                setStatus(`Error creating archive: ${error.message}`, 'error');
             }
+        }
+
+        // Event listeners
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            addFiles(e.target.files);
         });
 
-        unzipBtn.addEventListener('click', async () => {
-            if (files.length !== 1) {
-                setStatus('Please select a single file to extract.', 'error');
-                return;
-            }
-            const file = files[0];
-            if (!file.name.endsWith('.zip')) {
-                setStatus('Please select a ZIP file to extract.', 'error');
-                return;
-            }
-
-            setStatus('Extracting archive...', 'info');
-            console.log('📂 Starting extraction...');
-            const password = passwordInput.value;
-            
-            try {
-                const zip = new JSZip();
-                await zip.loadAsync(file.data, { password: password || undefined });
-
-                let downloadCount = 0;
-                zip.forEach((relativePath, zipEntry) => {
-                    if (!zipEntry.dir) {
-                        downloadCount++;
-                        zipEntry.async("blob").then(content => {
-                            const url = URL.createObjectURL(content);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = zipEntry.name.split('/').pop();
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
-                        });
-                    }
-                });
-
-                if (downloadCount === 0) {
-                    setStatus('Archive is empty or invalid.', 'error');
-                    console.log('⚠️ Archive is empty or invalid.');
-                } else {
-                    setStatus('Files extracted successfully! Downloads started.', 'success');
-                    console.log(`✅ Extracted ${downloadCount} files.`);
+        document.getElementById('extractInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (!checkFileSize(file)) {
+                    showWarning();
+                    return;
                 }
-
-            } catch (error) {
-                console.error("❌ Error extracting archive:", error);
-                setStatus(`Error extracting archive: ${error.message}`, 'error');
+                archiveToExtract = file;
+                document.getElementById('extractBtn').disabled = false;
+                showMessage(`Archive selected: ${file.name} (${formatFileSize(file.size)})`, 'success');
             }
         });
 
-        // Initial check on load
-        loadFromLocalStorage();
+        // Drag and drop for file selection
+        const dropZone = document.getElementById('dropZone');
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
 
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            addFiles(e.dataTransfer.files);
+        });
+
+        // Drag and drop for archive extraction
+        const extractDropZone = document.getElementById('extractDropZone');
+        
+        extractDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            extractDropZone.classList.add('dragover');
+        });
+
+        extractDropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            extractDropZone.classList.remove('dragover');
+        });
+
+        extractDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            extractDropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (!checkFileSize(file)) {
+                    showWarning();
+                    return;
+                }
+                archiveToExtract = file;
+                document.getElementById('extractBtn').disabled = false;
+                showMessage(`Archive selected: ${file.name} (${formatFileSize(file.size)})`, 'success');
+            }
+        });
+
+        // Initialize background animation
+        initBackground();
+        
+        // Update stored files display on load
+        updateStoredFiles();
     </script>
 </body>
 </html>
