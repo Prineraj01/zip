@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Made for Shourya by Prince</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
+        :root {
+            --neon-blue: #00e0ff;
+            --neon-pink: #ff00e0;
+            --neon-purple: #8e00ff;
+            --dark-bg: #0d0d1a;
+            --card-bg: #1a1a2e;
+            --card-border: 1px solid rgba(255, 255, 255, 0.1);
+            --text-color: #f0f0f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            padding: 2.5rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 40px var(--neon-purple), 0 0 60px var(--neon-pink);
+            border: var(--card-border);
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue);
+            letter-spacing: 2px;
+        }
+        .header p {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--neon-pink);
+            text-shadow: 0 0 3px var(--neon-pink);
+        }
+
+        .drop-zone {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 150px;
+            border: 2px dashed var(--neon-blue);
+            border-radius: 15px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .drop-zone:hover {
+            background-color: rgba(0, 224, 255, 0.1);
+        }
+        .drop-zone p {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--neon-blue);
+        }
+        .drop-zone p.info {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 0.5rem;
+        }
+
+        .file-list {
+            list-style: none;
+            margin-bottom: 1.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .file-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        .file-list::-webkit-scrollbar-track {
+            background: var(--card-bg);
+            border-radius: 10px;
+        }
+        .file-list::-webkit-scrollbar-thumb {
+            background: var(--neon-purple);
+            border-radius: 10px;
+        }
+        .file-list li {
+            padding: 0.5rem;
+            border-bottom: var(--card-border);
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            word-break: break-all;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .options .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .options label {
+            color: var(--neon-blue);
+            text-shadow: 0 0 2px var(--neon-blue);
+        }
+        .options input[type="password"],
+        .options input[type="text"],
+        .options select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            border-radius: 8px;
+            color: var(--text-color);
+            padding: 0.8rem;
+            font-family: 'Roboto Mono', monospace;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .options input:focus, .options select:focus {
+            box-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue);
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--neon-pink);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 5px var(--neon-pink);
+            transition: background 0.3s ease;
+        }
+        #compression-value {
+            min-width: 40px;
+            text-align: right;
+            color: var(--neon-pink);
+            text-shadow: 0 0 2px var(--neon-pink);
+        }
+
+        .actions {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+            color: var(--text-color);
+        }
+        .btn:hover {
+            box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+            transform: translateY(-2px);
+        }
+
+        .status-message, .progress-bar {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            transition: width 0.3s ease;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .popup {
+            background: var(--card-bg);
+            border: 2px solid var(--neon-pink);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink);
+        }
+        .popup h3 {
+            color: var(--neon-pink);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .popup p {
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+        .popup .close-btn {
+            background: var(--neon-pink);
+            color: var(--dark-bg);
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .popup .close-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <div class="header">
+            <h1>File Archiver</h1>
+            <p>Made for Shourya by Prince</p>
+        </div>
+
+        <div class="drop-zone" id="drop-zone">
+            <p>Drag & Drop files here</p>
+            <p class="info">or click to browse</p>
+            <input type="file" id="file-input" multiple hidden>
+        </div>
+
+        <ul class="file-list" id="file-list"></ul>
+
+        <div class="options">
+            <div class="option-group">
+                <label for="compression-level">Compression Level: <span id="compression-value">5</span></label>
+                <input type="range" id="compression-level" min="0" max="9" value="5">
+            </div>
+            <div class="option-group">
+                <label for="password">Password (optional):</label>
+                <input type="password" id="password" placeholder="Enter password for archive">
+            </div>
+            <div class="option-group">
+                <label for="archive-format">Archive Format:</label>
+                <select id="archive-format">
+                    <option value="zip">ZIP</option>
+                    <option value="tar">TAR</option>
+                    <option value="gzip">Gzip</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn" id="zip-btn">Create Archive</button>
+            <button class="btn" id="unzip-btn">Extract Archive</button>
+        </div>
+
+        <div class="progress-bar" id="progress-bar">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        </div>
+        <div class="status-message" id="status-message"></div>
+    </div>
+
+    <div class="popup-overlay" id="popup-overlay">
+        <div class="popup">
+            <h3>⚠️ Warning!</h3>
+            <p>Local Storage can only handle files up to **10 MB**. Please upload a smaller file.</p>
+            <button class="close-btn" id="close-popup">Got It</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileList = document.getElementById('file-list');
+        const zipBtn = document.getElementById('zip-btn');
+        const unzipBtn = document.getElementById('unzip-btn');
+        const compressionLevel = document.getElementById('compression-level');
+        const compressionValue = document.getElementById('compression-value');
+        const passwordInput = document.getElementById('password');
+        const archiveFormat = document.getElementById('archive-format');
+        const progressBar = document.getElementById('progress-bar');
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const statusMessage = document.getElementById('status-message');
+        const popupOverlay = document.getElementById('popup-overlay');
+        const closePopupBtn = document.getElementById('close-popup');
+        
+        let files = [];
+        const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+
+        // --- Background Animation ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null };
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            initParticles();
+        });
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function initParticles() {
+            for (let i = 0; i < 150; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.color = Math.random() > 0.5 ? 'var(--neon-blue)' : 'var(--neon-pink)';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        initParticles();
+        animate();
+
+        // --- File Handling ---
+        const saveToLocalStorage = () => {
+            try {
+                const serializedFiles = files.map(file => ({
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    data: btoa(String.fromCharCode(...new Uint8Array(file.data))),
+                }));
+                localStorage.setItem('shourya_files', JSON.stringify(serializedFiles));
+                console.log('Files saved to local storage.');
+            } catch (e) {
+                console.error('Error saving to local storage:', e);
+                setStatus('Error saving files. Local storage is full.', 'error');
+            }
+        };
+
+        const loadFromLocalStorage = () => {
+            const storedFiles = localStorage.getItem('shourya_files');
+            if (storedFiles) {
+                try {
+                    const parsedFiles = JSON.parse(storedFiles);
+                    files = parsedFiles.map(file => {
+                        const binaryString = atob(file.data);
+                        const len = binaryString.length;
+                        const bytes = new Uint8Array(len);
+                        for (let i = 0; i < len; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);
+                        }
+                        return new File([bytes.buffer], file.name, { type: file.type });
+                    });
+                    updateFileList();
+                    setStatus('Files loaded from local storage.', 'success');
+                } catch (e) {
+                    console.error('Error loading from local storage:', e);
+                    setStatus('Error loading files. Local storage data is corrupt.', 'error');
+                }
+            }
+        };
+
+        const handleFiles = (fileListObj) => {
+            files = [];
+            for (const file of fileListObj) {
+                if (file.size > MAX_SIZE) {
+                    showPopup();
+                    return;
+                }
+                files.push(file);
+            }
+            updateFileList();
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    file.data = e.target.result;
+                    saveToLocalStorage();
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        };
+
+        const updateFileList = () => {
+            fileList.innerHTML = '';
+            files.forEach(file => {
+                const li = document.createElement('li');
+                li.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                fileList.appendChild(li);
+            });
+            if (files.length > 0) {
+                statusMessage.textContent = `${files.length} file(s) loaded.`;
+            } else {
+                statusMessage.textContent = 'Ready to accept files.';
+            }
+        };
+
+        // --- UI Interactions ---
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.border = `2px dashed ${var(--neon-pink)}`;
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            dropZone.style.border = `2px dashed ${var(--neon-blue)}`;
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.border = `2px dashed ${var(--neon-blue)}`;
+            handleFiles(e.dataTransfer.files);
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        compressionLevel.addEventListener('input', (e) => {
+            compressionValue.textContent = e.target.value;
+        });
+
+        closePopupBtn.addEventListener('click', () => {
+            popupOverlay.style.display = 'none';
+        });
+
+        // --- Core Logic ---
+        const setStatus = (msg, type = 'info') => {
+            statusMessage.textContent = msg;
+            statusMessage.style.color = type === 'error' ? 'var(--neon-pink)' : (type === 'success' ? 'var(--neon-blue)' : 'var(--text-color)');
+            progressBar.style.display = 'none';
+        };
+
+        const showProgress = (value) => {
+            progressBar.style.display = 'block';
+            progressBarFill.style.width = `${value}%`;
+            statusMessage.textContent = `Processing... ${value.toFixed(0)}%`;
+        };
+
+        const showPopup = () => {
+            popupOverlay.style.display = 'flex';
+        };
+
+        zipBtn.addEventListener('click', async () => {
+            if (files.length === 0) {
+                setStatus('Please select files to archive.', 'error');
+                return;
+            }
+
+            setStatus('Creating archive...', 'info');
+            const zip = new JSZip();
+            const format = archiveFormat.value;
+            const compression = parseInt(compressionLevel.value);
+            const password = passwordInput.value;
+
+            for (const file of files) {
+                zip.file(file.name, file);
+            }
+
+            try {
+                const options = {
+                    type: "blob",
+                    compression: "DEFLATE",
+                    compressionOptions: {
+                        level: compression
+                    },
+                    password: password || undefined,
+                    onUpdate: (metadata) => {
+                        showProgress(metadata.percent);
+                    }
+                };
+                
+                let outputBlob;
+                if (format === 'zip') {
+                    outputBlob = await zip.generateAsync(options);
+                } else if (format === 'tar') {
+                    // JSZip doesn't support TAR, this would require a separate library
+                    setStatus('TAR format is not yet supported. Using ZIP.', 'error');
+                    outputBlob = await zip.generateAsync(options);
+                } else if (format === 'gzip') {
+                    const gzip = await JSZip.compress(await zip.generateAsync({type: 'blob'}), { level: compression });
+                    outputBlob = new Blob([gzip], { type: 'application/gzip' });
+                }
+
+                const url = URL.createObjectURL(outputBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `shourya_archive.${format === 'zip' ? 'zip' : (format === 'tar' ? 'tar' : 'gz')}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                setStatus('Archive created successfully! Download started.', 'success');
+                setTimeout(() => setStatus('Ready to accept files.'), 3000);
+            } catch (error) {
+                console.error("Error creating archive:", error);
+                setStatus(`Error creating archive: ${error.message}`, 'error');
+            }
+        });
+
+        unzipBtn.addEventListener('click', async () => {
+            if (files.length !== 1 || !files[0].name.endsWith('.zip')) {
+                setStatus('Please upload a single ZIP file to extract.', 'error');
+                return;
+            }
+
+            setStatus('Extracting archive...', 'info');
+            const file = files[0];
+            const password = passwordInput.value;
+            
+            try {
+                const zip = new JSZip();
+                await zip.loadAsync(file.data, { password: password || undefined });
+
+                let downloadCount = 0;
+                zip.forEach((relativePath, zipEntry) => {
+                    if (!zipEntry.dir) {
+                        downloadCount++;
+                        zipEntry.async("blob").then(content => {
+                            const url = URL.createObjectURL(content);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = zipEntry.name.split('/').pop();
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                        });
+                    }
+                });
+
+                if (downloadCount === 0) {
+                    setStatus('Archive is empty or invalid.', 'error');
+                } else {
+                    setStatus('Files extracted successfully! Downloads started.', 'success');
+                }
+
+            } catch (error) {
+                console.error("Error extracting archive:", error);
+                setStatus(`Error extracting archive: ${error.message}`, 'error');
+            }
+        });
+
+        // Initial check on load
+        loadFromLocalStorage();
+
+    </script>
+</body>
+</html>
