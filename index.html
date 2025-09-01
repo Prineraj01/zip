@@ -129,6 +129,18 @@
             align-items: center;
             word-break: break-all;
         }
+        .file-list li .remove-btn {
+            background: transparent;
+            border: none;
+            color: var(--neon-pink);
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .file-list li .remove-btn:hover {
+            transform: scale(1.2);
+        }
 
         .options {
             display: flex;
@@ -290,11 +302,11 @@
             <p>Made for Shourya by Prince</p>
         </div>
 
-        <div class="drop-zone" id="drop-zone">
+        <label for="file-input" class="drop-zone" id="drop-zone">
             <p>Drag & Drop files here</p>
             <p class="info">or click to browse</p>
             <input type="file" id="file-input" multiple hidden>
-        </div>
+        </label>
 
         <ul class="file-list" id="file-list"></ul>
 
@@ -435,17 +447,22 @@
             if (storedFiles) {
                 try {
                     const parsedFiles = JSON.parse(storedFiles);
-                    files = parsedFiles.map(file => {
-                        const binaryString = atob(file.data);
-                        const len = binaryString.length;
-                        const bytes = new Uint8Array(len);
-                        for (let i = 0; i < len; i++) {
-                            bytes[i] = binaryString.charCodeAt(i);
-                        }
-                        return new File([bytes.buffer], file.name, { type: file.type });
-                    });
-                    updateFileList();
-                    setStatus('Files loaded from local storage.', 'success');
+                    if (parsedFiles.length > 0) {
+                        files = parsedFiles.map(file => {
+                            const binaryString = atob(file.data);
+                            const len = binaryString.length;
+                            const bytes = new Uint8Array(len);
+                            for (let i = 0; i < len; i++) {
+                                bytes[i] = binaryString.charCodeAt(i);
+                            }
+                            // Recreate a proper File object from the raw data
+                            const newFile = new File([bytes.buffer], file.name, { type: file.type });
+                            newFile.data = bytes.buffer;
+                            return newFile;
+                        });
+                        updateFileList();
+                        setStatus('Files loaded from local storage.', 'success');
+                    }
                 } catch (e) {
                     console.error('Error loading from local storage:', e);
                     setStatus('Error loading files. Local storage data is corrupt.', 'error');
@@ -454,38 +471,71 @@
         };
 
         const handleFiles = (fileListObj) => {
+            if (fileListObj.length === 0) return;
+
             files = [];
+            const readers = [];
+            
+            // Check file sizes first
             for (const file of fileListObj) {
                 if (file.size > MAX_SIZE) {
                     showPopup();
                     return;
                 }
-                files.push(file);
             }
-            updateFileList();
-            files.forEach(file => {
+
+            // Process all files with readers
+            for (const file of fileListObj) {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    file.data = e.target.result;
-                    saveToLocalStorage();
-                };
-                reader.readAsArrayBuffer(file);
+                readers.push(
+                    new Promise(resolve => {
+                        reader.onload = () => {
+                            // Store the raw array buffer with the file object
+                            file.data = reader.result;
+                            files.push(file);
+                            resolve();
+                        };
+                        reader.readAsArrayBuffer(file);
+                    })
+                );
+            }
+
+            Promise.all(readers).then(() => {
+                updateFileList();
+                saveToLocalStorage();
+            }).catch(e => {
+                setStatus('Error reading files.', 'error');
+                console.error(e);
             });
         };
 
         const updateFileList = () => {
             fileList.innerHTML = '';
-            files.forEach(file => {
+            files.forEach((file, index) => {
                 const li = document.createElement('li');
-                li.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                li.innerHTML = `
+                    <span>${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                    <button class="remove-btn" data-index="${index}">&#10006;</button>
+                `;
                 fileList.appendChild(li);
             });
+
             if (files.length > 0) {
                 statusMessage.textContent = `${files.length} file(s) loaded.`;
             } else {
                 statusMessage.textContent = 'Ready to accept files.';
             }
         };
+
+        // Remove file from list
+        fileList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-btn')) {
+                const index = e.target.dataset.index;
+                files.splice(index, 1);
+                updateFileList();
+                saveToLocalStorage();
+            }
+        });
 
         // --- UI Interactions ---
         dropZone.addEventListener('dragover', (e) => {
@@ -501,10 +551,6 @@
             e.preventDefault();
             dropZone.style.border = `2px dashed ${var(--neon-blue)}`;
             handleFiles(e.dataTransfer.files);
-        });
-
-        dropZone.addEventListener('click', () => {
-            fileInput.click();
         });
 
         fileInput.addEventListener('change', (e) => {
@@ -549,7 +595,10 @@
             const password = passwordInput.value;
 
             for (const file of files) {
-                zip.file(file.name, file);
+                // Ensure data property exists from file reader
+                if (file.data) {
+                    zip.file(file.name, file.data);
+                }
             }
 
             try {
@@ -569,7 +618,6 @@
                 if (format === 'zip') {
                     outputBlob = await zip.generateAsync(options);
                 } else if (format === 'tar') {
-                    // JSZip doesn't support TAR, this would require a separate library
                     setStatus('TAR format is not yet supported. Using ZIP.', 'error');
                     outputBlob = await zip.generateAsync(options);
                 } else if (format === 'gzip') {
@@ -595,13 +643,17 @@
         });
 
         unzipBtn.addEventListener('click', async () => {
-            if (files.length !== 1 || !files[0].name.endsWith('.zip')) {
-                setStatus('Please upload a single ZIP file to extract.', 'error');
+            if (files.length !== 1) {
+                setStatus('Please select a single file to extract.', 'error');
+                return;
+            }
+            const file = files[0];
+            if (!file.name.endsWith('.zip')) {
+                setStatus('Please select a ZIP file to extract.', 'error');
                 return;
             }
 
             setStatus('Extracting archive...', 'info');
-            const file = files[0];
             const password = passwordInput.value;
             
             try {
